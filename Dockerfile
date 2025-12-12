@@ -1,5 +1,8 @@
+# --- build stage ---
 FROM registry.access.redhat.com/ubi8/openjdk-21:1.18 AS build
-WORKDIR /src
+
+# Wichtig: Workdir in schreibbar
+WORKDIR /tmp/src
 
 ENV HOME=/tmp
 ENV GRADLE_USER_HOME=/tmp/gradle
@@ -13,6 +16,6 @@ RUN ./gradlew --no-daemon -g /tmp/gradle clean bootJar -x test
 # --- runtime stage ---
 FROM registry.access.redhat.com/ubi8/openjdk-21-runtime:1.18
 WORKDIR /app
-COPY --from=build /src/build/libs/*.jar /app/app.jar
+COPY --from=build /tmp/src/build/libs/*.jar /app/app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]
