@@ -2,15 +2,10 @@
 FROM registry.access.redhat.com/ubi8/openjdk-21:1.18 AS build
 WORKDIR /src
 
-# Erst Gradle Wrapper + Buildfiles für besseres Layer-Caching
-COPY gradlew gradlew.bat settings.gradle build.gradle ./
+COPY --chmod=755 gradlew gradlew.bat settings.gradle build.gradle ./
 COPY gradle gradle
-RUN chmod +x gradlew
-
-# Dann Source
 COPY src src
 
-# BootJar bauen
 RUN ./gradlew clean bootJar -x test
 
 # --- runtime stage ---
